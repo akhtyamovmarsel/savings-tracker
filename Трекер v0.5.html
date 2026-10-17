@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f5f7f4"><title>Трекер накоплений — прототип</title>
+<style>
+:root{--bg:#f5f7f4;--card:#fff;--ink:#17231d;--muted:#718078;--green:#167847;--pale:#dff5e7;--line:#dfe6e0;--shadow:0 8px 24px #1c3b2610}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}.app{max-width:520px;margin:0 auto;padding:20px 16px 34px}.top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:4px 0 18px}.eyebrow{font-size:11px;letter-spacing:.1em;color:var(--muted);font-weight:700}.title{font-size:27px;line-height:1.15;margin:6px 0 5px;overflow-wrap:anywhere}.date{color:var(--muted);font-size:14px}.settings{border:1px solid var(--line);background:white;border-radius:14px;padding:11px 13px;font-size:20px}.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:19px;box-shadow:var(--shadow);margin-bottom:16px}.label{font-size:13px;color:var(--muted)}.saved{font-size:34px;font-weight:800;letter-spacing:-.04em;margin:3px 0 15px}.bar{height:10px;background:#e8eee9;border-radius:100px;overflow:hidden}.fill{height:100%;width:0;background:#22a05a;border-radius:100px;transition:width .18s}.barline{display:flex;justify-content:space-between;align-items:center;margin-top:9px;font-size:13px}.green{color:var(--green);font-weight:750}.stats{display:flex;justify-content:space-between;align-items:center;gap:12px;border-top:1px solid var(--line);padding-top:15px;margin-top:17px}.remain{font-size:22px;font-weight:800;margin-top:3px}.section-title{font-size:19px;margin:21px 0 5px}.hint{font-size:13px;color:var(--muted);margin:0 0 14px}.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}.cell{min-height:79px;border:1px solid var(--line);border-radius:16px;background:#fff;color:var(--ink);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}.cell .check{font-size:21px;line-height:1;color:#9aa69d}.cell .amount{font-size:13px;font-weight:750}.cell.done{background:var(--pale);border-color:#35a667;color:#145a34}.cell.done .check{color:#167847}.actions{display:flex;gap:9px;margin-top:16px}.btn{flex:1;border-radius:13px;padding:12px 9px;border:1px solid var(--line);background:#fff;color:var(--ink);font-weight:700;font-size:13px}.btn.primary{background:var(--green);border-color:var(--green);color:#fff}.settings-panel{display:none;margin-bottom:16px}.settings-panel.open{display:block}.field{display:block;margin-bottom:13px}.field span{display:block;font-size:13px;color:var(--muted);margin-bottom:6px}.field input{width:100%;padding:12px;border:1px solid var(--line);border-radius:12px;font:inherit;background:#fff;color:var(--ink)}.notice{font-size:11px;color:var(--muted);line-height:1.5;margin:18px 2px 0}.toast{min-height:18px;text-align:center;color:var(--green);font-size:12px;margin-top:8px}@media(min-width:430px){.grid{gap:11px}.cell{min-height:86px}}
+</style></head>
+<body><main class="app">
+<header class="top"><div><div class="eyebrow">МОЙ НАКОПИТЕЛЬНЫЙ ЧЕЛЛЕНДЖ</div><h1 class="title" id="goalTitle">Моя цель</h1><div class="date" id="dateText">Цель к 30 ноября 2026 г.</div></div><button class="settings" id="settingsBtn" aria-label="Настройки">⚙️</button></header>
+<section class="card"><div class="label">Уже накоплено</div><div class="saved" id="saved">300 ₽</div><div class="bar"><div class="fill" id="fill"></div></div><div class="barline"><span class="green" id="percent">3%</span><span class="label" id="targetText">Цель: 10 000 ₽</span></div><div class="stats"><div><div class="label">Осталось накопить</div><div class="remain" id="remaining">9 700 ₽</div></div><div style="font-size:27px" aria-hidden="true">👛</div></div></section>
+<section class="settings-panel card" id="settingsPanel"><label class="field"><span>Название цели</span><input id="goalInput" maxlength="50" value="Моя цель"></label><label class="field"><span>Целевая сумма, ₽</span><input id="targetInput" type="number" min="1" max="100000000" value="10000" inputmode="numeric"></label><label class="field"><span>Дата начала накоплений</span><input id="startDateInput" type="date" value="2026-11-01"></label><label class="field"><span>Дата завершения</span><input id="dateInput" type="date" value="2026-11-30"></label><button class="btn primary" id="saveSettings">Сохранить настройки</button></section>
+<h2 class="section-title">Выбери сумму</h2><p class="hint">Суммы в ячейках различаются, но в сумме дают ровно цель. Каждая ячейка соответствует одному календарному дню. Нажми на ячейку, когда отложишь эти деньги; повторное нажатие отменяет отметку.</p><section class="grid" id="grid" aria-label="Ячейки накоплений"></section>
+<div class="actions"><button class="btn" id="reset">Сбросить отметки</button><button class="btn primary" id="all">Отметить все</button></div><div class="toast" id="toast" aria-live="polite"></div>
+<p class="notice">Демонстрационный прототип. Данные пытаются сохраняться в хранилище браузера на этом устройстве. Если открыть файл локально на iPhone, сохранение между запусками зависит от браузера и способа открытия. Не вводи реальные банковские данные — приложение с банком не связано.</p>
+</main><script>
+(()=>{
+const initial={goal:'Моя цель',target:10000,startDate:'2026-11-01',date:'2026-11-30',marked:[0,1]};
+let state={...initial};
+try{const s=localStorage.getItem('savingsTrackerPrototype');if(s)state={...initial,...JSON.parse(s)};}catch(e){}
+const $=id=>document.getElementById(id);
+const fmt=n=>Math.round(n).toLocaleString('ru-RU')+' ₽';
+function dayCount(start,end){if(!start||!end)return 1;const a=new Date(start+'T12:00:00'),b=new Date(end+'T12:00:00');if(Number.isNaN(a.getTime())||Number.isNaN(b.getTime())||b<a)return 1;return Math.round((b-a)/86400000)+1;}
+function makeAmounts(target,count,seedText=''){
+  target=Math.max(1,Math.round(Number(target)||1));
+  count=Math.max(1,count);
+  if(count===1)return [target];
+  const average=target/count;
+  // Use a deliberately wider spread: roughly 20% to 180% of the daily average.
+  // Amounts remain unique and are corrected to sum to the target exactly.
+  const low=Math.max(1,Math.round(average*0.2));
+  const high=Math.max(low+count-1,Math.round(average*1.8));
+  const span=high-low;
+  let result=Array.from({length:count},(_,i)=>Math.round(low+i*span/(count-1)));
+  for(let i=1;i<count;i++)if(result[i]<=result[i-1])result[i]=result[i-1]+1;
+  let delta=target-result.reduce((a,b)=>a+b,0);
+  const shift=Math.trunc(delta/count);
+  if(shift){result=result.map(v=>v+shift);delta-=shift*count;}
+  // Distribute the remaining rubles without duplicates.
+  let guard=0;
+  while(delta!==0 && guard++<target+count*10){
+    const direction=delta>0?1:-1;
+    const used=new Set(result);
+    let moved=false;
+    for(let i=0;i<count && delta!==0;i++){
+      const candidate=result[i]+direction;
+      if(candidate>=1 && !used.has(candidate)){
+        used.delete(result[i]);result[i]=candidate;used.add(candidate);delta-=direction;moved=true;
+      }
+    }
+    if(!moved)break;
+  }
+  // Stable pseudo-random shuffle: cell amounts look scattered but do not change
+  // every time the user taps a cell and triggers a re-render.
+  let seed=2166136261;
+  for(const ch of `${target}|${count}|${seedText}`){seed^=ch.charCodeAt(0);seed=Math.imul(seed,16777619);}
+  const rand=()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296;};
+  for(let i=result.length-1;i>0;i--){const j=Math.floor(rand()*(i+1));[result[i],result[j]]=[result[j],result[i]];}
+  return result;
+}
+function persist(message){try{localStorage.setItem('savingsTrackerPrototype',JSON.stringify(state));$('toast').textContent=message||'Изменения сохранены';}catch(e){$('toast').textContent=message||'Изменения действуют в текущем сеансе; постоянное сохранение недоступно в этом режиме.';}}
+function render(){
+ const count=dayCount(state.startDate,state.date);
+ const amounts=makeAmounts(state.target,count,state.startDate+'|'+state.date);
+ const saved=amounts.reduce((sum,a,i)=>sum+(state.marked.includes(i)?a:0),0);
+ const target=Math.max(1,Math.round(Number(state.target)||1));
+ const p=Math.min(100,Math.round(saved/target*100));
+ $('goalTitle').textContent=state.goal||'Моя цель';
+ const dateOptions={day:'numeric',month:'long',year:'numeric'};
+ $('dateText').textContent=state.startDate&&state.date?`${new Date(state.startDate+'T12:00:00').toLocaleDateString('ru-RU',dateOptions)} — ${new Date(state.date+'T12:00:00').toLocaleDateString('ru-RU',dateOptions)} · ${count} дн.`:'Выбери период накоплений';
+ $('saved').textContent=fmt(saved);$('remaining').textContent=fmt(Math.max(0,target-saved));$('targetText').textContent='Цель: '+fmt(target);$('percent').textContent=p+'%';$('fill').style.width=p+'%';
+ $('grid').innerHTML='';
+ amounts.forEach((a,i)=>{const done=state.marked.includes(i);const b=document.createElement('button');b.className='cell'+(done?' done':'');b.setAttribute('aria-pressed',String(done));const day=state.startDate?new Date(new Date(state.startDate+'T12:00:00').getTime()+i*86400000).toLocaleDateString('ru-RU',{day:'numeric',month:'short'}):`День ${i+1}`;b.innerHTML='<span class="check">'+(done?'✓':'○')+'</span><span class="amount">'+fmt(a)+'</span><span style="font-size:10px;color:var(--muted)">'+day+'</span>';b.addEventListener('click',()=>{state.marked=done?state.marked.filter(n=>n!==i):[...state.marked,i];persist();render()});$('grid').appendChild(b)});
+ $('all').textContent='Отметить все';
+}
+$('settingsBtn').addEventListener('click',()=>{$('settingsPanel').classList.toggle('open');$('goalInput').value=state.goal;$('targetInput').value=state.target;$('startDateInput').value=state.startDate;$('dateInput').value=state.date;});
+$('saveSettings').addEventListener('click',()=>{
+ const start=$('startDateInput').value,end=$('dateInput').value;
+ if(!start||!end){$('toast').textContent='Укажи обе даты.';return;}
+ if(end<start){$('toast').textContent='Дата завершения не может быть раньше даты начала.';return;}
+ const count=dayCount(start,end),target=Math.max(1,Math.round(Number($('targetInput').value)||1));
+ if(target<count){$('toast').textContent='Целевая сумма должна быть не меньше количества дней, чтобы в каждой ячейке была сумма хотя бы 1 ₽.';return;}
+ if(count>1 && Math.round((target/count)*1.6) < count-1){$('toast').textContent='Для уникальных сумм с таким разбросом увеличь целевую сумму или сократи период накоплений.';return;}
+ state.goal=$('goalInput').value.trim()||'Моя цель';state.target=target;state.startDate=start;state.date=end;state.marked=[];
+ persist('Настройки обновлены. Отметки сброшены, так как суммы и количество дней изменились.');render();$('settingsPanel').classList.remove('open');
+});
+$('reset').addEventListener('click',()=>{state.marked=[];persist('Все отметки сброшены.');render()});
+$('all').addEventListener('click',()=>{const count=dayCount(state.startDate,state.date);state.marked=Array.from({length:count},(_,i)=>i);persist('Все ячейки отмечены.');render()});
+render();
+})();
+</script></body></html>
